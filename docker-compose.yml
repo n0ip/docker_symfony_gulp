@@ -1,0 +1,53 @@
+version: '2'
+services:
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+      args:
+        UID: $UID
+        GUID: $GUID
+    links:
+      - php
+    ports:
+      - "80:80"
+    volumes_from:
+      - php
+    volumes:
+      - "./shared/logs/nginx:/var/log/nginx"
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+      args:
+        UID: $UID
+        GUID: $GUID
+    links:
+      - db
+    expose:
+      - "9000"
+    volumes:
+      - "./shared/src:/var/www/symfony"
+  db:
+    image: "postgres:latest"
+    expose:
+      - "5432"
+    volumes:
+      - "./shared/postgresql/data:/var/lib/postgresql/data/pgdata"
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: alarm_dev
+      POSTGRES_USER: alarm
+      POSTGTRES_PASSWORD: 123
+  node:
+    build:
+      context: ./docker/node
+      dockerfile: Dockerfile
+      args:
+        UID: $UID
+        GUID: $GUID
+    expose:
+      - "8080"
+      - "8082"
+    volumes_from:
+      - php

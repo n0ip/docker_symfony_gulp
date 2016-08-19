@@ -1,0 +1,2 @@
+#!/bin/sh
+docker exec -u www-data:www-data -it alarm_php_1  /bin/bash
